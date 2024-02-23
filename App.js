@@ -13,12 +13,12 @@ import {
 import { LightSensor, Magnetometer } from "expo-sensors";
 import LPF from "lpf";
 
-let magnetometer = 0;
-
 export default function App() {
-  /*this.state = {
+  this.state = {
     magnetometer: "0",
-  };*/
+  };
+
+  // let magnetometer = 0;
 
   const { height, width } = Dimensions.get("window");
   const [{ illuminance }, setDataLightSensor] = useState({ illuminance: 0 });
@@ -34,12 +34,13 @@ export default function App() {
 
   useEffect(() => {
     LightSensor.addListener(setDataLightSensor);
-    //Magnetometer.addListener(setDataMagnetometer);
-    //    Magnetometer.addListener(setMagnetometerData);
+    // Magnetometer.addListener(setDataMagnetometer);
+    // Magnetometer.addListener(setMagnetometerData);
+
     Magnetometer.addListener((MagnetometerDataNew) => {
       setMagnetometerData(MagnetometerDataNew);
-      this.magnetometer = _angle(MagnetometerDataNew);
-      console.log(this.magnetometer);
+      magnetometer = _angle(MagnetometerDataNew);
+      console.log(magnetometer);
     });
 
     return () => {
@@ -58,6 +59,7 @@ export default function App() {
         angle = (Math.atan2(y, x) + 2 * Math.PI) * (180 / Math.PI);
       }
     }
+    LPF.smoothing = 0.3;
     return Math.round(LPF.next(angle));
   };
 
@@ -100,15 +102,21 @@ export default function App() {
       <Text style={styles.text}>x: {x.toFixed(1)}</Text>
       <Text style={styles.text}>y: {y.toFixed(1)}</Text>
       <Text style={styles.text}>z: {z.toFixed(1)}</Text>
-      <Text style={styles.text}>data: {this._degree(this.magnetometer)}</Text>
+      <Text style={styles.text}>data: {this._degree(magnetometer)}</Text>
       <Text style={styles.text}>
         {" "}
-        {this._direction(this._degree(this.magnetometer))}
+        {this._direction(this._degree(magnetometer))}
       </Text>
       <StatusBar style="auto" />
     </View>*/
-    <Grid style={{ backgroundColor: "black" }}>
-      <Row style={{ alignItems: "center" }} size={0.9}>
+    <Grid style={{ backgroundColor: "grey" }}>
+      <Row
+        style={{
+          alignItems: "center",
+          top: 20,
+        }}
+        size={0.5}
+      >
         <Col style={{ alignItems: "center" }}>
           <Text
             style={{
@@ -117,12 +125,12 @@ export default function App() {
               fontWeight: "bold",
             }}
           >
-            {this._direction(this._degree(this.magnetometer))}
+            {this._direction(this._degree(magnetometer))}
           </Text>
         </Col>
       </Row>
 
-      <Row style={{ alignItems: "center" }} size={0.1}>
+      <Row style={{ alignItems: "center" }} size={0.2}>
         <Col style={{ alignItems: "center" }}>
           <View style={{ width: width, alignItems: "center", bottom: 0 }}>
             <Image
@@ -146,7 +154,7 @@ export default function App() {
             textAlign: "center",
           }}
         >
-          {this._degree(this.magnetometer)}°
+          {this._degree(magnetometer)}°
         </Text>
 
         <Col style={{ alignItems: "center" }}>
@@ -157,15 +165,15 @@ export default function App() {
               justifyContent: "center",
               alignItems: "center",
               resizeMode: "contain",
-              transform: [{ rotate: 360 - this.magnetometer + "deg" }],
+              transform: [{ rotate: 360 - magnetometer + "deg" }],
             }}
           />
         </Col>
       </Row>
 
-      <Row style={{ alignItems: "center" }} size={1}>
+      <Row style={{ alignItems: "center" }} size={2}>
         <Col style={{ alignItems: "center" }}>
-          <Text style={{ color: "#fff" }}>RomanTomiczek</Text>
+          <Text style={{ color: "#fff" }}>Compas</Text>
         </Col>
       </Row>
     </Grid>
@@ -178,5 +186,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  rows: {
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "black",
   },
 });
